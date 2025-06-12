@@ -1,0 +1,339 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipherCheck</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            background: #121212;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 127, 0.2);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            border: 1px solid #00ff7f;
+        }
+        h2, h3 {
+            font-weight: 500;
+            color: #00ff7f;
+            margin: 0 0 16px;
+            font-size: 1.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 24px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #444;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            background: #222;
+            color: #e0e0e0;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00ff7f;
+            box-shadow: 0 0 8px rgba(0, 255, 127, 0.5);
+        }
+        button {
+            background: #00ff7f;
+            color: #121212;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #00cc66;
+            box-shadow: 0 0 12px rgba(0, 255, 127, 0.7);
+        }
+        #result {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #00ff7f;
+            margin: 16px 0;
+            text-align: center;
+            text-shadow: 0 0 8px rgba(0, 255, 127, 0.5);
+        }
+        .checkbox-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 8px;
+        }
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+        }
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        #feedbackSummary {
+            margin-top: 16px;
+            font-size: 1rem;
+            color: #e0e0e0;
+            text-align: center;
+        }
+        #customList {
+            margin-top: 24px;
+        }
+        .custom-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        .custom-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+        }
+        .delete-btn {
+            background: #ff4d4d;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .delete-btn:hover {
+            background: #cc3333;
+            box-shadow: 0 0 8px rgba(255, 77, 77, 0.5);
+        }
+        #importFile {
+            padding: 8px;
+            border: none;
+            background: none;
+            color: #00ff7f;
+        }
+        #importFile::-webkit-file-upload-button {
+            background: #444;
+            border: 1px solid #00ff7f;
+            color: #e0e0e0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #importFile::-webkit-file-upload-button:hover {
+            background: #00cc66;
+            color: #121212;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>CipherCheck</h2>
+        <input type="number" id="numberInput" maxlength="2" placeholder="Enter 2-digit code" oninput="checkNumber()" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+        <div id="result"></div>
+        <div id="checkboxContainer" class="checkbox-container" style="display: none;">
+            <label><input type="checkbox" id="trueCheckbox" onclick="submitVote(true)"> True</label>
+            <label><input type="checkbox" id="falseCheckbox" onclick="submitVote(false)"> False</label>
+        </div>
+        <div id="feedbackSummary"></div>
+        <h3>Add Custom Code</h3>
+        <input type="number" id="customNumber" maxlength="2" placeholder="Enter code" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))">
+        <select id="customResult">
+            <option value="big">Big</option>
+            <option value="small">Small</option>
+        </select>
+        <button onclick="addCustomResult()">Add Code</button>
+        <h3>Code Vault</h3>
+        <button onclick="downloadCustomResults()">Download Vault (.txt)</button>
+        <input type="file" id="importFile" accept=".txt" onchange="importCustomResults()">
+        <div id="customList"></div>
+    </div>
+
+    <script>
+        let customResults = JSON.parse(localStorage.getItem('customResults')) || {};
+        let feedback = JSON.parse(localStorage.getItem('feedback')) || {};
+
+        function checkNumber() {
+            const input = document.getElementById('numberInput').value;
+            const resultDiv = document.getElementById('result');
+            const checkboxContainer = document.getElementById('checkboxContainer');
+            const trueCheckbox = document.getElementById('trueCheckbox');
+            const falseCheckbox = document.getElementById('falseCheckbox');
+            
+            if (input.length === 2 && /^\d{2}$/.test(input)) {
+                if (customResults[input]) {
+                    resultDiv.textContent = customResults[input];
+                    checkboxContainer.style.display = 'flex';
+                    // Reset checkboxes for new vote
+                    trueCheckbox.checked = false;
+                    falseCheckbox.checked = false;
+                } else {
+                    resultDiv.textContent = 'Not Found';
+                    checkboxContainer.style.display = 'none';
+                    trueCheckbox.checked = false;
+                    falseCheckbox.checked = false;
+                }
+            } else {
+                resultDiv.textContent = '';
+                checkboxContainer.style.display = 'none';
+                trueCheckbox.checked = false;
+                falseCheckbox.checked = false;
+            }
+            updateFeedbackSummary();
+        }
+
+        function submitVote(isTrue) {
+            const input = document.getElementById('numberInput').value;
+            const trueCheckbox = document.getElementById('trueCheckbox');
+            const falseCheckbox = document.getElementById('falseCheckbox');
+
+            if (input.length === 2 && /^\d{2}$/.test(input) && customResults[input]) {
+                const resultKey = `${input}:${customResults[input]}`;
+                // Initialize feedback array for this resultKey if it doesn't exist
+                if (!feedback[resultKey]) {
+                    feedback[resultKey] = [];
+                }
+                // Record the vote
+                feedback[resultKey].push(isTrue);
+                // Update checkboxes to reflect the vote
+                trueCheckbox.checked = isTrue;
+                falseCheckbox.checked = !isTrue;
+                // Save to localStorage
+                localStorage.setItem('feedback', JSON.stringify(feedback));
+                // Update summary
+                updateFeedbackSummary();
+            }
+        }
+
+        function updateFeedbackSummary() {
+            const input = document.getElementById('numberInput').value;
+            const summaryDiv = document.getElementById('feedbackSummary');
+            if (input.length === 2 && /^\d{2}$/.test(input) && customResults[input]) {
+                const resultKey = `${input}:${customResults[input]}`;
+                const votes = feedback[resultKey] || [];
+                const trueCount = votes.filter(vote => vote === true).length;
+                const falseCount = votes.filter(vote => vote === false).length;
+                summaryDiv.textContent = `Correct: ${trueCount} | Incorrect: ${falseCount}`;
+            } else {
+                summaryDiv.textContent = '';
+            }
+        }
+
+        function addCustomResult() {
+            const number = document.getElementById('customNumber').value;
+            const result = document.getElementById('customResult').value;
+
+            if (number.length === 2 && /^\d{2}$/.test(number)) {
+                customResults[number] = result;
+                localStorage.setItem('customResults', JSON.stringify(customResults));
+                updateCustomList();
+                document.getElementById('customNumber').value = '';
+                checkNumber();
+            } else {
+                alert('Please enter a valid 2-digit code');
+            }
+        }
+
+        function deleteCustomResult(number) {
+            const result = customResults[number];
+            const resultKey = `${number}:${result}`;
+            if (feedback[resultKey]) {
+                delete feedback[resultKey];
+            }
+            delete customResults[number];
+            localStorage.setItem('customResults', JSON.stringify(customResults));
+            localStorage.setItem('feedback', JSON.stringify(feedback));
+            updateCustomList();
+            checkNumber();
+            updateFeedbackSummary();
+        }
+
+        function updateCustomList() {
+            const customList = document.getElementById('customList');
+            customList.innerHTML = '';
+            for (const [number, result] of Object.entries(customResults)) {
+                const item = document.createElement('div');
+                item.className = 'custom-item';
+                item.innerHTML = `
+                    <p>${number}: ${result}</p>
+                    <button class="delete-btn" onclick="deleteCustomResult('${number}')">Delete</button>
+                `;
+                customList.appendChild(item);
+            }
+        }
+
+        function downloadCustomResults() {
+            const textContent = Object.entries(customResults)
+                .map(([number, result]) => `${number}:${result}`)
+                .join('\n');
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'code_vault.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importCustomResults() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const lines = e.target.result.split('\n');
+                    const newResults = {};
+                    let valid = true;
+                    lines.forEach(line => {
+                        const [number, result] = line.split(':');
+                        if (number && result && number.length === 2 && /^\d{2}$/.test(number) && ['big', 'small'].includes(result.trim())) {
+                            newResults[number] = result.trim();
+                        } else {
+                            valid = false;
+                        }
+                    });
+                    if (!valid) {
+                        alert('Invalid data in file. Ensure format is: 2-digit code:big/small');
+                        return;
+                    }
+                    customResults = { ...customResults, ...newResults };
+                    localStorage.setItem('customResults', JSON.stringify(customResults));
+                    updateCustomList();
+                    checkNumber();
+                    fileInput.value = '';
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        updateCustomList();
+        updateFeedbackSummary();
+    </script>
+</body>
+</html>
